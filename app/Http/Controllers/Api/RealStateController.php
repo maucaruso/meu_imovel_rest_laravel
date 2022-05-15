@@ -77,7 +77,6 @@ class RealStateController extends Controller
 
     public function destroy($id)
     {
-
         try {
             $realState = $this->realState->findOrFail($id);
             $realState->delete();
