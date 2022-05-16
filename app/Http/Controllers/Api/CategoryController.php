@@ -4,18 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Api\ApiMessages;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UserRequest;
-use App\Models\User;
+use App\Http\Requests\CategoryRequest;
+use App\Models\Category;
 
-class UserController extends Controller
+class CategoryController extends Controller
 {
-    private $user;
+    private $category;
 
-    public function __construct(User $user)
+    public function __construct(Category $category)
     {
-        $this->user = $user;
+        $this->category = $category;
     }
-
     /**
      * Display a listing of the resource.
      *
@@ -23,9 +22,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = $this->user->paginate('10');
+        $categories = $this->category->paginate('10');
 
-        return response()->json($users, 200);
+        return response()->json($categories, 200);
     }
 
     /**
@@ -34,22 +33,16 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(UserRequest $request)
+    public function store(CategoryRequest $request)
     {
         $data = $request->all();
 
-        if (!$request->has('password') || !$request->get('password')) {
-            $message = new ApiMessages('É necessário informar uma senha para o usuário');
-            return response()->json($message->getMessage(), 401);
-        }
-
         try {
-            $data['password'] = bcrypt($data['password']);
-            $user = $this->user->create($data);
+            $category = $this->category->create($data);
 
             return response()->json([
                 'data' => [
-                    'msg' => 'Usuário cadastrado com sucesso'
+                    'msg' => 'Categoria cadastrada com sucesso'
                 ]
             ], 200);
         } catch (\Exception $e) {
@@ -68,10 +61,10 @@ class UserController extends Controller
     {
         try {
 
-            $user = $this->user->findOrFail($id);
+            $category = $this->category->findOrFail($id);
 
             return response()->json([
-                'data' => $user
+                'data' => $category
             ], 200);
         } catch (\Exception $e) {
             $message = new ApiMessages($e->getMessage());
@@ -86,23 +79,17 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UserRequest $request, $id)
+    public function update(CategoryRequest $request, $id)
     {
         $data = $request->all();
 
-        if ($request->has('password') || $request->get('password')) {
-            $data['password'] = bcrypt($data['password']);
-        } else {
-            unset($data['password']);
-        }
-
         try {
-            $user = $this->user->findOrFail($id);
-            $user->update($data);
+            $category = $this->category->findOrFail($id);
+            $category->update($data);
 
             return response()->json([
                 'data' => [
-                    'msg' => 'Usuário atualizado com sucesso'
+                    'msg' => 'Categoria atualizada com sucesso'
                 ]
             ], 200);
         } catch (\Exception $e) {
@@ -120,13 +107,27 @@ class UserController extends Controller
     public function destroy($id)
     {
         try {
-            $user = $this->user->findOrFail($id);
-            $user->delete();
+            $category = $this->category->findOrFail($id);
+            $category->delete();
 
             return response()->json([
                 'data' => [
-                    'msg' => 'Usuário removido com sucesso'
+                    'msg' => 'Categoria removida com sucesso'
                 ]
+            ], 200);
+        } catch (\Exception $e) {
+            $message = new ApiMessages($e->getMessage());
+            return response()->json($message->getMessage(), 401);
+        }
+    }
+
+    public function realState($id)
+    {
+        try {
+            $category = $this->category->findOrFail($id);
+
+            return response()->json([
+                'data' => $category->realStates
             ], 200);
         } catch (\Exception $e) {
             $message = new ApiMessages($e->getMessage());
