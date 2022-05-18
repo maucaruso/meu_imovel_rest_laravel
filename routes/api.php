@@ -27,6 +27,9 @@ Route::prefix('v1')->namespace('App\\Http\\Controllers\\Api\\')->group(function 
 
     Route::get('refresh', 'Auth\\LoginJwtController@refresh')->name('refresh');
 
+    Route::get('search', 'RealStateSearchController@index')->name('search');
+    //Route::get('search', 'RealStateSearchController@index')->name('search');
+
     Route::group(['middleware' => ['jwt.auth']], function () {
 
         Route::name('real-states.')->group(function () {
