@@ -21,27 +21,36 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::prefix('v1')->namespace('App\\Http\\Controllers\\Api\\')->group(function () {
 
-    Route::name('real-states.')->group(function () {
+    Route::post('login', 'Auth\\LoginJwtController@login')->name('login');
 
-        Route::resource('real-states', 'RealStateController');
-    });
+    Route::get('logout', 'Auth\\LoginJwtController@logout')->name('logout');
 
-    Route::name('users.')->group(function () {
+    Route::get('refresh', 'Auth\\LoginJwtController@refresh')->name('refresh');
 
-        Route::resource('users', 'UserController');
-    });
+    Route::group(['middleware' => ['jwt.auth']], function () {
 
-    Route::name('categories.')->group(function () {
+        Route::name('real-states.')->group(function () {
 
-        Route::get('/categories/{id}/real-states', 'CategoryController@realState');
+            Route::resource('real-states', 'RealStateController');
+        });
 
-        Route::resource('categories', 'CategoryController');
-    });
+        Route::name('users.')->group(function () {
 
-    Route::name('photos.')->prefix('photos')->group(function () {
+            Route::resource('users', 'UserController');
+        });
 
-        Route::delete('/{id}', 'RealStatePhotoController@remove')->name('delete');
+        Route::name('categories.')->group(function () {
 
-        Route::put('/set-thumb/{photoId}/{realStateId}', 'RealStatePhotoController@setThumb')->name('delete');
+            Route::get('/categories/{id}/real-states', 'CategoryController@realState');
+
+            Route::resource('categories', 'CategoryController');
+        });
+
+        Route::name('photos.')->prefix('photos')->group(function () {
+
+            Route::delete('/{id}', 'RealStatePhotoController@remove')->name('delete');
+
+            Route::put('/set-thumb/{photoId}/{realStateId}', 'RealStatePhotoController@setThumb')->name('delete');
+        });
     });
 });
