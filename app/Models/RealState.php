@@ -9,7 +9,7 @@ class RealState extends Model
 {
     use HasFactory;
 
-    protected $appends = ['_links'];
+    protected $appends = ['_links', 'thumb'];
     protected $table = 'real_state';
     protected $fillable = [
         'user_id',
@@ -30,6 +30,15 @@ class RealState extends Model
             'href' => route('real-states.real-states.show', ['real_state' => $this->id]),
             'rel' => 'Imóveis'
         ];
+    }
+
+    public function getThumbAttribute()
+    {
+        $thumb = $this->photos()->where('is_thumb', true);
+
+        if (!$thumb->count()) return null;
+
+        return $thumb->first()->photo;
     }
 
     public function user()
